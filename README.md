@@ -70,7 +70,5 @@ Este proyecto ha permitido reforzar:
 
 ## 👤 Autor
 
-## 👤 Autor
-
 **Alejandro Gálvez Beneroso**  
 Data Analyst en formación
