@@ -25,7 +25,7 @@ ORDER BY length ASC;
 --6  Encuentra el nombre y apellido de los actores que tengan ‘Allenʼ en su apellido
 SELECT first_name, last_name 
 FROM actor
-WHERE last_name ILIKE '%Allen%';
+WHERE last_name = 'ALLEN';
 
 --7 Encuentra la cantidad total de películas en cada clasificación de la tabla “filmˮ y muestra la clasificación junto con el recuento.
 SELECT rating AS "Clasificacion",
@@ -51,14 +51,20 @@ SELECT
 FROM film;
 
 -- 11 Encuentra lo que costó el antepenúltimo alquiler ordenado por día.
+
+--Encuentro primero el antepenultimo dia
+WITH antepenultimo_alquiler AS (
+    SELECT rental_id, rental_date
+    FROM rental
+    ORDER BY rental_date DESC
+    LIMIT 1 OFFSET 2
+)
 SELECT 
-    r.rental_date,
+    a.rental_date,
     p.amount
-FROM rental r
+FROM antepenultimo_alquiler a
 JOIN payment p
-    ON r.rental_id = p.rental_id
-ORDER BY r.rental_date DESC
-LIMIT 1 OFFSET 2;
+    ON p.rental_id = a.rental_id;
 
 
 -- 12 Encuentra el título de las películas en la tabla “filmˮ que no sean ni ‘NC-17ʼ ni ‘Gʼ en cuanto a su clasificación.
@@ -98,7 +104,7 @@ JOIN film f
 	ON fa.film_id = f.film_id 
 JOIN actor a  
 	ON a.actor_id = fa.actor_id 
-WHERE f.title ILIKE 'Egg Igby';
+WHERE f.title = 'EGG IGBY';
 
 -- 18 Selecciona todos los nombres de las películas únicos.
 SELECT DISTINCT(title)
@@ -176,7 +182,7 @@ ORDER BY "Mes";
 SELECT 
 	ROUND(AVG(amount),2) AS promedio,
 	ROUND(STDDEV(amount),2) AS desv_estandar,
-	ROUND(VARIANCE(amount),2) AS total_pagado
+	ROUND(VARIANCE(amount),2) AS varianza
 FROM payment;
 
 -- 27. ¿Qué películas se alquilan por encima del precio medio?
@@ -545,11 +551,11 @@ ORDER BY a.last_name, a.first_name;
 /* 57  Encuentra el título de todas las películas que fueron alquiladas por más de 8 días.*/
 SELECT DISTINCT
 	f.title,
-	EXTRACT(DAY FROM (r.return_date - r.rental_date)) AS  n_dias
+	r.return_date - r.rental_date AS  n_dias
 FROM rental r
 JOIN inventory i ON i.inventory_id = r.inventory_id 
 JOIN film f ON f.film_id = i.film_id
-WHERE EXTRACT(DAY FROM (r.return_date - r.rental_date)) > 8 AND r.return_date IS NOT NULL;
+WHERE (r.return_date - r.rental_date) > INTERVAL '8 days' AND r.return_date IS NOT NULL;
 
 
 /* 58 Encuentra el título de todas las películas que son de la misma categoría 
